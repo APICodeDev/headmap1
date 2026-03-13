@@ -7,8 +7,9 @@ class ChartManager {
         this.candlestickSeries = null;
         this.priceLine = null;
         this.liquidityLines = [];
+        this.currentCandles = []; // Almacenar velas localmente
     }
-
+    
     init() {
         const chartContainer = document.getElementById(this.containerId);
         this.chart = LightweightCharts.createChart(chartContainer, {
@@ -52,12 +53,21 @@ class ChartManager {
     updateData(candles) {
         if (this.candlestickSeries) {
             this.candlestickSeries.setData(candles);
+            this.currentCandles = candles; // Guardar referencia local
         }
+    }
+
+    getLastCandleTime() {
+        return this.currentCandles.length > 0 ? this.currentCandles[this.currentCandles.length - 1].time : null;
+    }
+
+    getFirstCandleTime() {
+        return this.currentCandles.length > 0 ? this.currentCandles[0].time : null;
     }
 
     updatePriceLine(price) {
         if (this.priceLine && price) {
-            const lastTime = this.candlestickSeries.data()[this.candlestickSeries.data().length - 1]?.time;
+            const lastTime = this.getLastCandleTime();
             if (lastTime) {
                 this.priceLine.setData([{ time: lastTime, value: price }]);
             }
@@ -71,10 +81,11 @@ class ChartManager {
             lineStyle: LightweightCharts.LineStyle.Dashed,
             priceLineVisible: false,
         });
-        const lastTime = this.candlestickSeries.data()[this.candlestickSeries.data().length - 1]?.time;
-        if (lastTime) {
+        const firstTime = this.getFirstCandleTime();
+        const lastTime = this.getLastCandleTime();
+        if (firstTime && lastTime) {
             line.setData([
-                { time: this.candlestickSeries.data()[0].time, value: price },
+                { time: firstTime, value: price },
                 { time: lastTime, value: price }
             ]);
         }
