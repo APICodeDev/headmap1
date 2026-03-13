@@ -9,9 +9,9 @@ class LiquidityAnalyzer {
     // Calcular zonas de liquidez basadas en datos de velas con volumen
     calculateZones(candles, currentPrice) {
         this.zones = [];
-        if (candles.length < 50) return;
+        if (candles.length < 10) return;
 
-        // Detectar zonas de alta actividad/volumen
+        // Detectar zonas basadas en máximos/mínimos significativos y volumen
         const liquidityZones = this.findLiquidityZones(candles);
 
         // Agrupar niveles cercanos
@@ -21,8 +21,9 @@ class LiquidityAnalyzer {
         this.zones = levels.map(level => ({
             price: level.price,
             strength: level.strength,
-            type: level.type, // 'buy' o 'sell' basado en vela
-            score: this.calculateScore(level, currentPrice, candles)
+            type: level.type, // 'buy' o 'sell' basado en máximo/mínimo
+            score: this.calculateScore(level, currentPrice, candles),
+            volume: level.totalVolume
         }));
 
         // Ordenar por puntuación
@@ -36,15 +37,79 @@ class LiquidityAnalyzer {
         const zones = [];
         const volumes = candles.map(c => c.volume);
         const avgVolume = volumes.reduce((a, b) => a + b) / volumes.length;
-        const threshold = avgVolume * 1.5; // Velas con volumen > 1.5x promedio
-
-        for (let i = 0; i < candles.length; i++) {
-            if (candles[i].volume > threshold) {
-                const price = candles[i].close; // Usar close como precio de actividad
-                const type = candles[i].close > candles[i].open ? 'buy' : 'sell'; // Compra si cerró arriba, venta si abajo
-                zones.push({ price, type, volume: candles[i].volume, index: i });
+        
+        // Analizar últimos 50-100 candles para encontrar zonas relevantes
+        const lookback = Math.min(100, candles.length);
+        const recentCandles = candles.slice(-lookback);
+        
+        for (let i = 1; i < recentCandles.length - 1; i++) {
+            const candle = recentCandles[i];
+            const prevCandle = recentCandles[i - 1];
+            const nextCandle = recentCandles[i + 1];
+            
+            // Detectar máximos locales (resistencia/zona de venta)
+            if (candle.high > prevCandle.high && candle.high > nextCandle.high) {
+                // Confirmar si hay volumen significativo
+                const volumeRatio = candle.volume / avgVolume;
+                if (volumeRatio >= 1.2) { // 20% más que promedio
+                    zones.push({ 
+                        price: candle.high, 
+                        type: 'sell', 
+                        volume: candle.volume,
+                        high: candle.high,
+                        low: candle.low,
+                        totalVolume: candle.volume
+                    });
+                }
+            }
+            
+            // Detectar mínimos locales (soporte/zona de compra)
+            if (candle.low < prevCandle.low && candle.low < nextCandle.low) {
+                const volumeRatio = candle.volume / avgVolume;
+                if (volumeRatio >= 1.2) { // 20% más que promedio
+                    zones.push({ 
+                        price: candle.low, 
+                        type: 'buy', 
+                        volume: candle.volume,
+                        high: candle.high,
+                        low: candle.low,
+                        totalVolume: candle.volume
+                    });
+                }
             }
         }
+        
+        // También considerar velas con volumen excepcionalmente alto
+        const highVolumeThreshold = avgVolume * 2.0;
+        for (let i = 0; i < recentCandles.length; i++) {
+            if (recentCandles[i].volume > highVolumeThreshold) {
+                const candle = recentCandles[i];
+                const isBullish = candle.close > candle.open;
+                
+                // Para velas alcistas con alto volumen, el mínimo es zona de compra
+                if (isBullish) {
+                    zones.push({ 
+                        price: candle.low, 
+                        type: 'buy', 
+                        volume: candle.volume,
+                        high: candle.high,
+                        low: candle.low,
+                        totalVolume: candle.volume
+                    });
+                } else {
+                    // Para velas bajistas con alto volumen, el máximo es zona de venta
+                    zones.push({ 
+                        price: candle.high, 
+                        type: 'sell', 
+                        volume: candle.volume,
+                        high: candle.high,
+                        low: candle.low,
+                        totalVolume: candle.volume
+                    });
+                }
+            }
+        }
+        
         return zones;
     }
 
@@ -57,6 +122,7 @@ class LiquidityAnalyzer {
                     group.strength++;
                     group.prices.push(swing.price);
                     group.price = group.prices.reduce((a, b) => a + b) / group.prices.length;
+                    group.totalVolume += swing.totalVolume || swing.volume; // Acumular volumen
                     found = true;
                     break;
                 }
@@ -66,7 +132,8 @@ class LiquidityAnalyzer {
                     price: swing.price,
                     type: swing.type,
                     strength: 1,
-                    prices: [swing.price]
+                    prices: [swing.price],
+                    totalVolume: swing.totalVolume || swing.volume
                 });
             }
         });
@@ -78,13 +145,18 @@ class LiquidityAnalyzer {
 
         // Cercanía al precio actual
         const distance = Math.abs(level.price - currentPrice) / currentPrice;
-        score += (1 - distance) * 50; // Máximo 50 puntos por cercanía
+        score += (1 - Math.min(distance * 10, 1)) * 50; // Máximo 50 puntos por cercanía
 
         // Fuerza del nivel (repeticiones)
         score += level.strength * 10;
 
-        // Volumen relativo (si disponible)
-        // Aquí podríamos agregar lógica de volumen si estuviera disponible
+        // Volumen relativo
+        if (level.totalVolume) {
+            const volumes = candles.map(c => c.volume);
+            const avgVolume = volumes.reduce((a, b) => a + b) / volumes.length;
+            const volumeRatio = level.totalVolume / avgVolume;
+            score += Math.min(volumeRatio * 5, 20); // Máximo 20 puntos por volumen
+        }
 
         // Compatibilidad con tendencia
         const trend = this.calculateTrend(candles);
