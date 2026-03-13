@@ -55,7 +55,8 @@ class App {
 
                 // Dibujar zonas en el gráfico
                 zones.forEach(zone => {
-                    const color = zone.type === 'buy' ? '#00d4ff' : '#ff5722';
+                    // Verde semi-transparente para compras, rojo semi-transparente para ventas
+                    const color = zone.type === 'buy' ? '#00C853' : '#FF1744';
                     chartManager.addLiquidityLevel(zone.price, color, zone.type);
                 });
 
