@@ -4,7 +4,7 @@ class CryptoAPI {
     constructor() {
         this.baseURL = 'https://api.binance.com/api/v3';
         this.symbols = [];
-        this.currentSymbol = 'BTCUSDT';
+        this.currentSymbol = 'XRPUSDT';
     }
 
     // Obtener lista de símbolos disponibles
