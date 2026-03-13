@@ -40,6 +40,7 @@ class ChartManager {
             borderVisible: false,
             wickUpColor: '#00C853',
             wickDownColor: '#FF1744',
+            zIndex: 1, // Asegurar que las velas estén en primer plano
         });
 
         // Línea de precio actual
@@ -47,6 +48,7 @@ class ChartManager {
             color: '#00d4ff',
             lineWidth: 2,
             priceLineVisible: false,
+            zIndex: 2, // Línea de precio sobre las velas
         });
     }
 
@@ -75,11 +77,14 @@ class ChartManager {
     }
 
     addLiquidityLevel(price, color, label) {
+        // Convertir color hex a RGBA con baja opacidad (0.15 = 15% opaco, más transparente)
+        const rgbaColor = this.hexToRgba(color, 0.15);
         const line = this.chart.addLineSeries({
-            color: color,
-            lineWidth: 1,
+            color: rgbaColor,
+            lineWidth: 2,
             lineStyle: LightweightCharts.LineStyle.Dashed,
             priceLineVisible: false,
+            zIndex: 0, // Zonas de liquidez en el fondo
         });
         const firstTime = this.getFirstCandleTime();
         const lastTime = this.getLastCandleTime();
@@ -91,6 +96,14 @@ class ChartManager {
         }
         this.liquidityLines.push(line);
         return line;
+    }
+
+    // Convertir color hex a RGBA
+    hexToRgba(hex, alpha) {
+        const r = parseInt(hex.slice(1, 3), 16);
+        const g = parseInt(hex.slice(3, 5), 16);
+        const b = parseInt(hex.slice(5, 7), 16);
+        return `rgba(${r}, ${g}, ${b}, ${alpha})`;
     }
 
     clearLiquidityLines() {
