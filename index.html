@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Heatmap de Liquidez - Trading Crypto</title>
+    <link rel="stylesheet" href="assets/css/styles.css?v=4.1.1">
+    <script
+        src="https://unpkg.com/lightweight-charts@4.1.1/dist/lightweight-charts.standalone.production.js?v=4.1.1"></script>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>Mapa de Calor de Liquidez</h1>
+            <div class="search-container">
+                <input type="text" id="search-input" placeholder="Buscar activo (ej: BTCUSDT)" autocomplete="off">
+                <div id="suggestions" class="suggestions"></div>
+            </div>
+            <button id="refresh-btn" class="refresh-btn">Actualizar</button>
+        </header>
+        <div id="message-bar" class="message-bar"></div>
+        <main>
+            <div class="chart-container">
+                <div id="chart"></div>
+                <div id="liquidity-overlay"></div>
+                <div id="price-label" class="price-label"></div>
+            </div>
+            <aside id="analysis-panel">
+                <div class="panel-card">
+                    <h3>Activo Seleccionado</h3>
+                    <p id="selected-symbol">-</p>
+                </div>
+                <div class="panel-card">
+                    <h3>Precio Actual</h3>
+                    <p id="current-price">-</p>
+                </div>
+                <div class="panel-card">
+                    <h3>Cambio 24h</h3>
+                    <p id="change-24h">-</p>
+                </div>
+                <div class="panel-card">
+                    <h3>Tendencia</h3>
+                    <p id="trend">-</p>
+                </div>
+                <div class="panel-card">
+                    <h3>Zona Objetivo</h3>
+                    <p id="target-zone">-</p>
+                </div>
+                <div class="panel-card">
+                    <h3>Sesgo Actual</h3>
+                    <p id="bias">-</p>
+                </div>
+                <div class="panel-card">
+                    <h3>Niveles Cercanos</h3>
+                    <p id="near-levels">-</p>
+                </div>
+                <div class="panel-card">
+                    <h3>Última Actualización</h3>
+                    <p id="last-update">-</p>
+                </div>
+            </aside>
+        </main>
+    </div>
+    <script src="assets/js/api.js?v=1"></script>
+    <script src="assets/js/chart.js?v=1"></script>
+    <script src="assets/js/liquidity.js?v=1"></script>
+    <script src="assets/js/ui.js?v=1"></script>
+    <script src="assets/js/app.js?v=1"></script>
+</body>
+
+</html>

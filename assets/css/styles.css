@@ -1,0 +1,275 @@
+/* Estilos generales */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 100%);
+    color: #e0e0e0;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Header */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    animation: fadeIn 0.5s ease-in;
+}
+
+.refresh-btn {
+    background: linear-gradient(135deg, hsla(190, 100%, 50%, 0.452), #0099cc);
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 25px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3);
+}
+
+.refresh-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 212, 255, 0.4);
+}
+
+.refresh-btn:active {
+    transform: translateY(0);
+}
+
+h1 {
+    font-size: 2rem;
+    font-weight: 300;
+    color: hsla(190, 100%, 50%, 0.39);
+}
+
+/* Buscador */
+.search-container {
+    position: relative;
+    width: 300px;
+}
+
+#search-input {
+    width: 100%;
+    padding: 12px 20px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 25px;
+    color: #e0e0e0;
+    font-size: 1rem;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+#search-input:focus {
+    border-color: oklab(80.661% -0.11342 -0.09168 / 0.534);
+    box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+}
+
+.suggestions {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 1000;
+    display: none;
+}
+
+.suggestion-item {
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.suggestion-item:hover {
+    background: rgba(0, 212, 255, 0.2);
+}
+
+/* Main layout */
+.message-bar {
+    margin: 12px 0;
+    padding: 10px 15px;
+    border-radius: 10px;
+    border: 1px solid rgba(0, 212, 255, 0.1);
+    background: rgba(0, 0, 0, 0.55);
+    color: #cfd8dc;
+    font-size: 0.95rem;
+    display: none;
+}
+
+.message-bar.show {
+    display: block;
+    animation: fadeIn 0.4s ease;
+}
+
+main {
+    display: flex;
+    gap: 20px;
+}
+
+.chart-container {
+    flex: 1;
+    position: relative;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+    animation: slideIn 0.5s ease-out;
+}
+
+#chart {
+    width: 100%;
+    height: 600px;
+}
+
+#liquidity-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 10;
+}
+
+#price-label {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: hsla(190, 100%, 50%, 0.315);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    z-index: 20;
+    animation: fadeIn 0.5s ease-in;
+}
+
+/* Panel lateral */
+#analysis-panel {
+    width: 300px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.panel-card {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 15px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+    animation: fadeInUp 0.5s ease-out;
+    animation-delay: calc(var(--i) * 0.1s);
+}
+
+.panel-card h3 {
+    font-size: 0.9rem;
+    color: #00d4ff;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.panel-card p {
+    font-size: 1.1rem;
+    font-weight: 500;
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(-20px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Loading states */
+.loading {
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0.1) 25%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.1) 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+    0% {
+        background-position: 200% 0;
+    }
+
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    main {
+        flex-direction: column;
+    }
+
+    #analysis-panel {
+        width: 100%;
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+
+    .panel-card {
+        flex: 1 1 45%;
+        min-width: 200px;
+    }
+}
